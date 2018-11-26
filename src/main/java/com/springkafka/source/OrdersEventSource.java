@@ -2,31 +2,45 @@ package com.springkafka.source;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.integration.support.MessageBuilder;
+import org.springframework.kafka.support.KafkaHeaders;
+import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.springkafka.Binding;
-import com.springkafka.PageViewEvent;
+import com.springkafka.OrderEvent;
 
 @RestController
-public class PageViewEventSource {
+@RequestMapping("order")
+public class OrdersEventSource {
 
-    private final MessageChannel pageViewsOut;
+    private final MessageChannel ordersOut;
     private final Log log = LogFactory.getLog(getClass());
 
-    public PageViewEventSource(Binding binding) {
-        this.pageViewsOut = binding.pageViewsOut();
+    public OrdersEventSource(Binding binding) {
+        this.ordersOut = binding.ordersOut();
     }
-    
+
     @PostMapping
-    public PageViewEvent save(@RequestBody PageViewEvent pageViewEvent) {
-        
-        
-        return pageViewEvent;
+    public OrderEvent save(@RequestBody OrderEvent order) {
+        log.info("Order recorded: ");
+
+        Message<OrderEvent> message = MessageBuilder.withPayload(order)
+                .setHeader(KafkaHeaders.MESSAGE_KEY, order.getProductId()).build();
+        try {
+            this.ordersOut.send(message);
+            log.info("sent " + message.toString());
+        } catch (Exception e) {
+            log.error(e);
+        }
+
+        return order;
     }
-    
+
 //
 //    @Override
 //    public void run(ApplicationArguments args) throws Exception {

@@ -8,23 +8,21 @@ import org.springframework.messaging.MessageChannel;
 
 public interface Binding {
 
-    String PAGE_VIEWS_OUT = "pvout";
-    String PAGE_VIEWS_IN = "pvin";
-    String PAGE_COUNT_MV = "pcmv";
-    String PAGE_COUNT_OUT = "pcout";
-    String PAGE_COUNT_IN = "pcin";
+    String ORDERS_OUT = "orders_out";
+    String ORDERS_IN = "orders_in";
+    String SALES_ACCOUNTABILITY = "sales_account";
+    String SALES_OUT = "sales_out";
+    String SALES_IN = "sales_in";
 
-    // page views
-    @Input(PAGE_VIEWS_IN)
-    KStream<String, PageViewEvent> pageViewsIn();
+    @Input(ORDERS_IN)
+    KStream<String, OrderEvent> pageViewsIn();
 
-    @Output(PAGE_VIEWS_OUT)
-    MessageChannel pageViewsOut();
+    @Output(ORDERS_OUT)
+    MessageChannel ordersOut();
 
-    // page counts
-    @Output(PAGE_COUNT_OUT)
-    KStream<String, Long> pageCountOut();
+    @Output(SALES_OUT)
+    KStream<String, Long> salesAnalyticsOut();
 
-    @Input(PAGE_COUNT_IN)
-    KTable<String, Long> pageCountIn();
+    @Input(SALES_IN)
+    KTable<String, Long> salesIn();
 }

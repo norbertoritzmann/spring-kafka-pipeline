@@ -9,18 +9,16 @@ import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Component;
 
 import com.springkafka.Binding;
-import com.springkafka.PageViewEvent;
+import com.springkafka.OrderEvent;
 
 @Component
-public class PageViewEventProcessor {
+public class OrdersEventProcessor {
 
     @StreamListener
-    @SendTo(Binding.PAGE_COUNT_OUT)
-    public KStream<String, Long> process(@Input(Binding.PAGE_VIEWS_IN) KStream<String, PageViewEvent> events) {
-        return events.filter((key, value) -> value.getDuration() > 10)
-            .map((key, value) -> new KeyValue<>(value.getPage(), "0"))
-            .groupByKey()
-            .count(Materialized.as(Binding.PAGE_COUNT_MV))
+    @SendTo(Binding.SALES_OUT)
+    public KStream<String, Long> process(@Input(Binding.ORDERS_IN) KStream<String, OrderEvent> events) {
+        return events.groupByKey()
+            .count(Materialized.as(Binding.SALES_ACCOUNTABILITY))
             .toStream();
     }
 }

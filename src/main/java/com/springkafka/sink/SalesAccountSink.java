@@ -10,12 +10,12 @@ import org.springframework.stereotype.Component;
 import com.springkafka.Binding;
 
 @Component
-public class PageCountSink {
+public class SalesAccountSink {
 
     private final Log log = LogFactory.getLog(getClass());
 
     @StreamListener
-    public void process(@Input((Binding.PAGE_COUNT_IN)) KTable<String, Long> counts) {
+    public void process(@Input((Binding.SALES_IN)) KTable<String, Long> counts) {
         counts.toStream()
             .foreach((key, value) -> log.info(key + "=" + value));
     }
