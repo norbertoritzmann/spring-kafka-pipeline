@@ -2,10 +2,13 @@ package com.springkafka.source;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.cloud.stream.annotation.EnableBinding;
+import org.springframework.cloud.stream.messaging.Source;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,6 +19,7 @@ import com.springkafka.OrderEvent;
 
 @RestController
 @RequestMapping("order")
+@EnableBinding(Source.class)
 public class OrdersEventSource {
 
     private final MessageChannel ordersOut;
@@ -26,11 +30,13 @@ public class OrdersEventSource {
     }
 
     @PostMapping
+    @SendTo(Source.OUTPUT)
     public OrderEvent save(@RequestBody OrderEvent order) {
         log.info("Order recorded: ");
 
         Message<OrderEvent> message = MessageBuilder.withPayload(order)
-                .setHeader(KafkaHeaders.MESSAGE_KEY, order.getProductId()).build();
+                .setHeader(KafkaHeaders.MESSAGE_KEY, order.getProductId())
+                .build();
         try {
             this.ordersOut.send(message);
             log.info("sent " + message.toString());
